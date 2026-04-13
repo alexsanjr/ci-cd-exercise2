@@ -1,7 +1,6 @@
 .git
 .github
 **/*_test.go
-Dockerfile
 docker-compose.yml
 README.md
 *.md

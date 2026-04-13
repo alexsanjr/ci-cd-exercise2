@@ -1,9 +1,5 @@
 package user
 
-import (
-	"errors"
-)
-
 type InMemoryUserRepository struct {
 	users  []User
 	nextID int
@@ -26,7 +22,7 @@ func (r *InMemoryUserRepository) GetByID(id int) (*User, error) {
 			return &u, nil
 		}
 	}
-	return nil, errors.New("user not found")
+	return nil, errUserNotFound
 }
 
 func (r *InMemoryUserRepository) Create(u User) (*User, error) {
@@ -44,7 +40,7 @@ func (r *InMemoryUserRepository) Update(id int, u User) (*User, error) {
 			return &u, nil
 		}
 	}
-	return nil, errors.New("user not found")
+	return nil, errUserNotFound
 }
 
 func (r *InMemoryUserRepository) Delete(id int) error {
@@ -54,5 +50,5 @@ func (r *InMemoryUserRepository) Delete(id int) error {
 			return nil
 		}
 	}
-	return errors.New("user not found")
+	return errUserNotFound
 }

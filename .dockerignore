@@ -1,0 +1,16 @@
+.git
+.github
+**/*_test.go
+Dockerfile
+docker-compose.yml
+README.md
+*.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Go
+bin/
+*.exe
+*.out

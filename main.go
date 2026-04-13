@@ -1,13 +1,30 @@
 package main
 
 import (
-	"net/http"
-	"log"
 	"api-go/user"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 )
 
 func main() {
-	repo := user.NewUserRepository()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "3000"
+	}
+
+	var repo user.UserRepository
+	if os.Getenv("DB_HOST") != "" || os.Getenv("DATABASE_URL") != "" {
+		pgRepo, err := user.NewPostgresUserRepositoryFromEnv()
+		if err != nil {
+			log.Fatal(err)
+		}
+		repo = pgRepo
+	} else {
+		repo = user.NewUserRepository()
+	}
+
 	service := user.NewUserService(repo)
 	controller := user.NewUserController(service)
 
@@ -33,6 +50,6 @@ func main() {
 		}
 	})
 
-	log.Println("Server running on http://localhost:3000")
-	log.Fatal(http.ListenAndServe(":3001", mux))
+	log.Printf("Server running on http://localhost:%s", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), mux))
 }

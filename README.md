@@ -4,12 +4,14 @@
 API simples desenvolvida em GO como forma de treinamento para criação do dockerfile, compose e ci/cd
 
 Pré-requisitos
-- Go instalado (>= 1.20)
+- Docker Desktop (recomendado)
+- (Opcional) Go instalado localmente
 
 Passo a passo
-- cd api-go
-- go mod tidy
-- go run main.go
+- Sem Go instalado (via Docker): veja as seções de Docker/Compose abaixo.
+- Com Go instalado:
+  - `go mod tidy`
+  - `go run main.go`
 
 A API estará disponível em:
 - http://localhost:3000
@@ -26,6 +28,15 @@ Você deverá criar um Dockerfile para essa aplicação
 - Expor porta 3000
 - Executar a API
 
+### Como rodar
+
+- Build:
+  - `docker build -t api-go:local .`
+- Run:
+  - `docker run --rm -p 3000:3000 api-go:local`
+
+Acesse: `http://localhost:3000/users`
+
 
 ## 🐳 (Atividade 2) Rodando com Compose
 
@@ -38,6 +49,28 @@ Você deverá modificar a aplicação para fazer acesso ao banco de dados. Crie 
   - A aplicação em go
   - O banco PostgreSQL
   - O PGAdmin
+
+### Como rodar
+
+- Subir tudo:
+  - `docker compose up -d --build`
+
+Serviços:
+- API: `http://localhost:3000`
+- PostgreSQL: `localhost:5432` (usuário `app`, senha `app`, database `app`)
+- PGAdmin: `http://localhost:5050`
+  - Email: `admin@admin.com`
+  - Senha: `admin`
+
+Para conectar no PGAdmin:
+- Create Server
+  - Host: `db`
+  - Port: `5432`
+  - Username: `app`
+  - Password: `app`
+
+Parar:
+- `docker compose down`
 
 
 
@@ -65,3 +98,19 @@ Crie um CI/CD no github actions com as seguintes etapas
    - DAST (OWASP ZAP)
    - Criação da aprovação manual
    - Deploy em produção
+
+### Workflow implementado
+
+O workflow está em `.github/workflows/ci-cd.yml` e roda em `push`/`pull_request`.
+
+Notas:
+- Testes de integração rodam com a tag `integration` e precisam de Postgres (no CI é um service container).
+- Passos de Sonar/Push/Deploy/DAST são **opcionais** e só rodam se você configurar os `secrets` no repositório.
+
+Secrets suportados (opcionais):
+- `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`
+- `SONAR_TOKEN`, `SONAR_HOST_URL`, `SONAR_PROJECT_KEY`
+- `RENDER_HOMOLOG_DEPLOY_HOOK`, `HOMOLOG_BASE_URL`
+- `RENDER_PROD_DEPLOY_HOOK`, `PROD_BASE_URL`
+
+Para aprovação manual no deploy de produção, configure o Environment `production` no GitHub (Settings → Environments) com required reviewers.
